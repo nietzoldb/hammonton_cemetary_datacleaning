@@ -258,6 +258,8 @@ m = df_concat.shape[0]
 while j < m:
     if df_concat.DOB[j] == 'nan':
         df_concat=df_concat.drop(j)
+    elif df_concat.DOB[j] == '000':
+        df_concat=df_concat.drop(j)
     elif df_concat.DOD[j] == 'nan':
         df_concat=df_concat.drop(j)    
     elif df_concat.DOD[j] == '000':
@@ -270,14 +272,11 @@ while j < m:
 
 
 df_concat.info()
-df_concat.astype({'DOB':'int32'})
-df_concat.astype({'DOD':'int32'})
-df_concat.info()
-
-    
-df_concat['LifeSpan'] = df_concat['DOD'] - df_concat['DOB']
+df_concat['DOB'] = df_concat['DOB'].astype('int32')
+df_concat['DOD'] = df_concat['DOD'].astype('int32')
+print(df_concat.dtypes)   
+df_concat['LifeSpan'] = df_concat['DOD']-df_concat['DOB']
 #df_concat_clean=df_concat.dropna()
 
 
-print(df_concat.isna())
  
