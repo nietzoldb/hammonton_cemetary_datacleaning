@@ -82,6 +82,10 @@ n2_count=0
 l3_count=0
 l2_count=0
 all1_count=0
+splitk3n1l1_count=0
+splitk1n3l1_count=0
+splitk1n1l3_count=0
+splitk1n1l1_count=0
 j=0
 m = df_concat.shape[0]
 while j < m:
@@ -91,6 +95,8 @@ while j < m:
     n=len(str(df_concat.iloc[j,2]).split('-'))
     l=len(str(df_concat.iloc[j,2]).split(' '))
     p = max(k,n,l)
+    
+    
     if k > k_max:
         k_max=k
 
@@ -105,17 +111,19 @@ while j < m:
     
     if k == max(k,n,l):
         if k >= 3:
-            print(k,l,n)
+            if n==1 & l==1:
+                splitk3n1l1_count+=1    
             df_concat['DOB'][j] = str(df_concat['DOB'][j]).split('/')[k-1]
             print(df_concat['DOB'][j])        
             k3_count +=1
         elif k == 2:
-            print(k,l,n)
+            
             df_concat['DOB'][j] = str(df_concat['DOB'][j]).split('/')[1]
             print(df_concat['DOB'][j])    
             k2_count +=1 
         elif k == 1:
-            print(k,l,n)
+            if n==1 & l==1:
+                splitk1n1l1_count +=1           
             df_concat['DOB'][j] = str(df_concat['DOB'][j]).split('/')[0]
             print(df_concat['DOB'][j])    
             all1_count +=1       
@@ -123,19 +131,21 @@ while j < m:
     
     elif n == max(k,n,l):
         if n >= 3:        
-            print(k,l,n)
+            if k==1 & l==1:
+                splitk1n3l1_count+=1            
             df_concat['DOB'][j] = str(df_concat['DOB'][j]).split('-')[n-1]
             print(df_concat['DOB'][j]) 
             n3_count +=1
         elif n == 2:
-            print(k,l,n)
+
             df_concat['DOB'][j] = str(df_concat['DOB'][j]).split('-')[1]
             print(df_concat['DOB'][j]) 
             n2_count +=1           
     
     elif l == max(k,n,l):
         if l >= 3:
-            print(k,l,n)
+            if n==1 & k==1:
+                splitk1n1l3_count+=1            
             df_concat['DOB'][j] = str(df_concat['DOB'][j]).split(' ')[(l-1)]
             print('look at index:%s' %j)  
             print(df_concat['DOB'][j])          
@@ -147,7 +157,7 @@ while j < m:
             l2_count +=1
           
     elif k == l == n:    
-        print(k,l,n)
+        
         df_concat['DOB'][j] = str(df_concat['DOB'][j]).split(' ')[0]
         print(df_concat['DOB'][j])   
         all1_count +=1 
@@ -156,11 +166,11 @@ while j < m:
         this implies a date is in some other format 
         '''
         print(' look at index:%s' %j)  
-        print(k,l,n)
+        
         
     j +=1
   
-  
+total= splitk3n1l1_count+splitk1n3l1_count+splitk1n1l3_count+splitk1n1l1_count 
   
 k_max_d=0
 n_max_d=0
@@ -274,9 +284,25 @@ while j < m:
 df_concat.info()
 df_concat['DOB'] = df_concat['DOB'].astype('int32')
 df_concat['DOD'] = df_concat['DOD'].astype('int32')
+
 print(df_concat.dtypes)   
 df_concat['LifeSpan'] = df_concat['DOD']-df_concat['DOB']
+df_concat['LifeSpan'] = df_concat['LifeSpan'].astype('int32')
+
 #df_concat_clean=df_concat.dropna()
+df_concat.reset_index
+j=0
+q = df_concat.columns.value_counts
+m = df_concat.shape[0]
+while j < m:
+    print(df_concat['LifeSpan'][j])
+    if int(df_concat['LifeSpan'][j]) < 0:
+        hold_df_count_DOD=df_concat['DOD'][j]
+        df_concat['DOD'][j]=df_concat['DOB'][j]
+        df_concat['DOB'][j]=hold_df_count_DOD
+    elif df_concat['LifeSpan'] > 200:
+        df_concat=df_concat.drop(j)
+    j +=1  
 
+df_concat.info() 
 
- 
